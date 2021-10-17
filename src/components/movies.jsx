@@ -1,21 +1,32 @@
-import React, { Component } from "react";
-import _ from "lodash";
+import React from "react";
+import { nanoid } from "nanoid";
 
 import { getMovies } from "../services/fakeMovieService";
-import Pagination from "./pagination";
+import { genres, getGenres } from "../services/fakeGenreService";
+import Pagination from "./common/pagination";
+import ListGroup from "./common/listGroup";
 import Paginate from "../utils/paginate";
+import MoviesTable from "./moviesTable";
 
 class Movies extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      movies: getMovies(),
       pageSize: 4,
       currentPage: 1,
+      genres: [],
+      selectedGenre: "",
+      movies: [],
     };
     this.handleClick = this.handleClick.bind(this);
     this.handlePageChange = this.handlePageChange.bind(this);
+    this.onGenreChange = this.onGenreChange.bind(this);
+  }
+
+  componentDidMount() {
+    const genres = [{ name: "All Genres" }, ...getGenres()];
+    this.setState({ movies: getMovies(), genres });
   }
 
   handleDelete(id) {
@@ -35,54 +46,48 @@ class Movies extends React.Component {
     this.setState({ currentPage: page });
   }
 
+  onGenreChange(genre) {
+    this.setState({ selectedGenre: genre, currentPage: 1 });
+  }
+
   render() {
-    const { movies, pageSize, currentPage } = this.state;
-    // Originaly we have movies array
-    // I need to modify this array each time we click a pagination button
-    // currentPage 1 [item1,item2, item3, item4] , currentPage 2 [item5,item6,item7,item8]
-    // modify the movies array pased on the index of the each page
-    // starting point , end point and list
+    const {
+      movies: allMovies,
+      pageSize,
+      currentPage,
+      genres,
+      selectedGenre,
+    } = this.state;
 
-    // ex ['a' , 'b' , 'c' , 'd' , 'e' ,  'f' , 'g' , 'h' , 'i' , 'j' ]
+    if (allMovies.length === 0) return "movies list is empty";
 
-    if (movies.length === 0) return "movies list is empty";
+    const filtered =
+      selectedGenre && selectedGenre._id
+        ? allMovies.filter(m => m.genre._id === selectedGenre._id)
+        : allMovies;
 
-    const paginatedMovies = Paginate(movies, currentPage, pageSize);
-
-    const renderMovies = paginatedMovies.map(movie => {
-      return (
-        <tr key={movie._id}>
-          <td>{movie.title}</td>
-          <td>{movie.genre.name}</td>
-          <td>{movie.numberInStock}</td>
-          <td>{movie.dailyRentalRate}</td>
-        </tr>
-      );
-    });
+    const movies = Paginate(filtered, currentPage, pageSize);
 
     return (
-      <>
-        {movies.length && <p>rendring {movies.length} movies</p>}
-        <table className="table">
-          <thead>
-            <tr>
-              <th scope="col">Title</th>
-              <th scope="col">Genre</th>
-              <th scope="col">Stock</th>
-              <th scope="col">Rate</th>
-              <th scope="col"></th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>{renderMovies}</tbody>
-        </table>
-        <Pagination
-          itemsCount={movies.length}
-          pageSize={pageSize}
-          currentPage={currentPage}
-          onPageChange={this.handlePageChange}
-        />
-      </>
+      <div className="d-flex flex-row">
+        <div className="col-3">
+          <ListGroup
+            items={genres}
+            selectedItem={selectedGenre}
+            onItemSelect={this.onGenreChange}
+          />
+        </div>
+        <div className="col-9">
+          {<p>rendring {filtered.length} movies</p>}
+          <MoviesTable movies={movies} />
+          <Pagination
+            itemsCount={filtered.length}
+            pageSize={pageSize}
+            currentPage={currentPage}
+            onPageChange={this.handlePageChange}
+          />
+        </div>
+      </div>
     );
   }
 }
