@@ -53,14 +53,7 @@ class Movies extends React.Component {
     this.setState({ selectedGenre: genre, currentPage: 1 });
   }
 
-  handleSort(path) {
-    const sortColumn = { ...this.state.sortColumn };
-    if (sortColumn.path === path)
-      sortColumn.order = sortColumn.order === "asc" ? "desc" : "asc";
-    else {
-      sortColumn.path = path;
-      sortColumn.order = "asc";
-    }
+  handleSort(sortColumn) {
     this.setState({
       sortColumn,
     });
@@ -97,7 +90,13 @@ class Movies extends React.Component {
         </div>
         <div className="col-9">
           {<p>rendring {filtered.length} movies</p>}
-          <MoviesTable onSort={this.handleSort} movies={movies} />
+          <MoviesTable
+            sortColumn={sortColumn}
+            movies={movies}
+            onSort={this.handleSort}
+            // onLike={this.handleLike}
+            // onDelete={this.handleDelete}
+          />
           <Pagination
             itemsCount={filtered.length}
             pageSize={pageSize}
