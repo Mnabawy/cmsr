@@ -1,13 +1,14 @@
-const MoviesTable = ({ movies }) => {
+const MoviesTable = props => {
+  const { movies, onSort } = props;
   return (
     <table className="table">
       <thead>
         <tr>
-          <th scope="col">Title</th>
-          <th scope="col">Genre</th>
-          <th scope="col">Stock</th>
-          <th scope="col">Rate</th>
-          <th scope="col"></th>
+          <th onClick={() => onSort("title")}>Title</th>
+          <th onClick={() => onSort("genre.name")}>Genre</th>
+          <th onClick={() => onSort("numberInStock")}>Stock</th>
+          <th onClick={() => onSort("dailyRentalRate")}>Rate</th>
+          <th onClick={() => onSort("")}></th>
           <th></th>
         </tr>
       </thead>

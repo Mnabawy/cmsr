@@ -1,5 +1,5 @@
 import React from "react";
-import { nanoid } from "nanoid";
+import _ from "lodash";
 
 import { getMovies } from "../services/fakeMovieService";
 import { genres, getGenres } from "../services/fakeGenreService";
@@ -17,15 +17,18 @@ class Movies extends React.Component {
       currentPage: 1,
       genres: [],
       selectedGenre: "",
+      sortColumn: { path: "title", order: "asc" },
       movies: [],
     };
     this.handleClick = this.handleClick.bind(this);
     this.handlePageChange = this.handlePageChange.bind(this);
     this.onGenreChange = this.onGenreChange.bind(this);
+    this.handleSort = this.handleSort.bind(this);
   }
 
   componentDidMount() {
-    const genres = [{ name: "All Genres" }, ...getGenres()];
+    const genres = [{ _id: "", name: "All Genres" }, ...getGenres()];
+
     this.setState({ movies: getMovies(), genres });
   }
 
@@ -50,6 +53,19 @@ class Movies extends React.Component {
     this.setState({ selectedGenre: genre, currentPage: 1 });
   }
 
+  handleSort(path) {
+    const sortColumn = { ...this.state.sortColumn };
+    if (sortColumn.path === path)
+      sortColumn.order = sortColumn.order === "asc" ? "desc" : "asc";
+    else {
+      sortColumn.path = path;
+      sortColumn.order = "asc";
+    }
+    this.setState({
+      sortColumn,
+    });
+  }
+
   render() {
     const {
       movies: allMovies,
@@ -57,6 +73,7 @@ class Movies extends React.Component {
       currentPage,
       genres,
       selectedGenre,
+      sortColumn,
     } = this.state;
 
     if (allMovies.length === 0) return "movies list is empty";
@@ -65,8 +82,9 @@ class Movies extends React.Component {
       selectedGenre && selectedGenre._id
         ? allMovies.filter(m => m.genre._id === selectedGenre._id)
         : allMovies;
+    const sorted = _.orderBy(filtered, [sortColumn.path], [sortColumn.order]);
 
-    const movies = Paginate(filtered, currentPage, pageSize);
+    const movies = Paginate(sorted, currentPage, pageSize);
 
     return (
       <div className="d-flex flex-row">
@@ -79,7 +97,7 @@ class Movies extends React.Component {
         </div>
         <div className="col-9">
           {<p>rendring {filtered.length} movies</p>}
-          <MoviesTable movies={movies} />
+          <MoviesTable onSort={this.handleSort} movies={movies} />
           <Pagination
             itemsCount={filtered.length}
             pageSize={pageSize}
