@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 class MoviesTable extends React.Component {
   raiseSort = path => {
@@ -32,7 +33,9 @@ class MoviesTable extends React.Component {
           {movies.map(movie => {
             return (
               <tr key={movie._id}>
-                <td>{movie.title}</td>
+                <td>
+                  <Link to={`/movies/${movie._id}`}>{movie.title}</Link>
+                </td>
                 <td>{movie.genre.name}</td>
                 <td>{movie.numberInStock}</td>
                 <td>{movie.dailyRentalRate}</td>
