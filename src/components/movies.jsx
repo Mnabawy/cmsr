@@ -94,8 +94,6 @@ class Movies extends React.Component {
             sortColumn={sortColumn}
             movies={movies}
             onSort={this.handleSort}
-            // onLike={this.handleLike}
-            // onDelete={this.handleDelete}
           />
           <Pagination
             itemsCount={filtered.length}

@@ -1,4 +1,3 @@
-import "./App.css";
 import {
   Switch,
   Route,
@@ -12,6 +11,7 @@ import Rentals from "./components/rentals";
 import NavBar from "./components/navBar";
 import NotFound from "./components/notFound";
 import MovieForm from "./components/movieForm";
+import LoginForm from "./components/loginForm";
 
 function App() {
   return (
@@ -24,6 +24,7 @@ function App() {
             <Route path="/movies"  component={Movies} />
             <Route path="/customers" component={Customers} />
             <Route path="/rentals" component={Rentals} />
+            <Route path="/login" component={LoginForm} />
             <Route path="/not-found" component={NotFound} />
             <Route path="/" exact component={Movies} />
             <Redirect to="/not-found" />
