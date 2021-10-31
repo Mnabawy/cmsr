@@ -1,4 +1,4 @@
-const InputField = (props) => {
+const InputField = props => {
   return (
     <div className="form-group">
       <label htmlFor={props.name}>{props.label}</label>
@@ -9,6 +9,7 @@ const InputField = (props) => {
         type={props.type}
         className="form-control"
       />
+      {props.error && <div className="alert alert-danger">{props.error}</div>}
     </div>
   );
 };
