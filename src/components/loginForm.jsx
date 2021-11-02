@@ -1,4 +1,6 @@
 import React from "react";
+import Joi from "joi-browser";
+
 import InputField from "./common/inputField";
 
 class LoginForm extends React.Component {
@@ -10,17 +12,35 @@ class LoginForm extends React.Component {
     errors: {},
   };
 
+  schema = {
+    username: Joi.string().required().label("Username"),
+    password: Joi.string().required().label("Password"),
+  };
+
   validate = () => {
+    const result = Joi.validate(this.state.account, this.schema, {
+      abortEarly: false,
+    });
+
+    if (!result.error) return null;
+
     const errors = {};
+    const errorsArray = result.error.details;
+    for (let item of errorsArray) {
+      errors[item.path] = item.message;
+    }
+    return errors;
+  };
 
-    const { account } = this.state;
-    if (account.username.trim() === "")
-      errors.username = "Username is required.";
-    if (account.password.trim() === "")
-      errors.password = "Password is required.";
+  validateProperty = ({ name, value }) => {
+    // first create a obj with key value as name: value
+    // validate the element using joi and add the err to the obj
+    // return the errors obj]
+    const obj = { [name]: value };
+    const schema = { [name]: this.schema[name] };
+    const { error } = Joi.validate(obj, schema);
 
-    // to check if the errors object has keys
-    return Object.keys(errors).length === 0 ? null : errors;
+    return error ? error.details[0].message : null;
   };
 
   handleSubmit = e => {
@@ -34,13 +54,21 @@ class LoginForm extends React.Component {
   };
 
   handleChange = e => {
+    const { name, value } = e.target;
+    const input = e.target;
+    const errors = { ...this.state.errors };
+    const errorMessage = this.validateProperty(input);
 
+    if (errorMessage) errors[input.name] = errorMessage;
+    else delete errors[input.name];
 
-    const account = {...this.state.account};
-    account[e.target.name] = e.target.value;
+    // changing the state
+    const account = { ...this.state.account };
+    account[name] = value;
 
     this.setState({
       account,
+      errors,
     });
   };
 
