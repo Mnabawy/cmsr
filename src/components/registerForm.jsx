@@ -4,18 +4,20 @@ import Joi from "joi-browser";
 import InputField from "./common/inputField";
 import Form from "./common/form";
 
-class LoginForm extends Form {
+class RegisterForm extends Form {
   state = {
     data: {
       username: "",
       password: "",
+      name: "",
     },
     errors: {},
   };
 
   schema = {
-    username: Joi.string().required().label("Username"),
-    password: Joi.string().required().label("Password"),
+    username: Joi.string().email().required().label("Username"),
+    password: Joi.string().required().min(5).label("Password"),
+    name: Joi.string().required().label("Name"),
   };
 
   doSubmit = () => {
@@ -24,27 +26,38 @@ class LoginForm extends Form {
   };
 
   render() {
+    const { data, errors } = this.state;
+
     return (
-      <div className="container">
-        <h1>Login</h1>
+      <div className="contianer">
+        <h1>Register</h1>
         <form onSubmit={this.handleSubmit}>
           <InputField
             label="Username"
+            value={data.username}
+            onChange={this.handleChange}
             name="username"
             type="text"
             className="form-control"
-            value={this.state.data.username}
-            onChange={this.handleChange}
-            error={this.state.errors.username}
+            error={errors.username}
           />
           <InputField
-            label="password"
+            label="Password"
+            value={data.password}
+            onChange={this.handleChange}
             name="password"
             type="password"
             className="form-control"
-            value={this.state.data.password}
+            error={errors.password}
+          /> 
+          <InputField
+            label="Name"
+            value={data.name}
             onChange={this.handleChange}
-            error={this.state.errors.password}
+            name="name"
+            type="text"
+            className="form-control"
+            error={errors.name}
           />
           <button type="submit" className="btn btn-primary">
             Submit
@@ -55,4 +68,4 @@ class LoginForm extends Form {
   }
 }
 
-export default LoginForm;
+export default RegisterForm;
