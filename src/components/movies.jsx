@@ -7,6 +7,7 @@ import Pagination from "./common/pagination";
 import ListGroup from "./common/listGroup";
 import Paginate from "../utils/paginate";
 import MoviesTable from "./moviesTable";
+import { Link } from "react-router-dom";
 
 class Movies extends React.Component {
   constructor(props) {
@@ -90,6 +91,8 @@ class Movies extends React.Component {
         </div>
         <div className="col-9">
           {<p>rendring {filtered.length} movies</p>}
+
+          <Link to="/movies/new" className="btn btn-primary" >new movie</Link>
           <MoviesTable
             sortColumn={sortColumn}
             movies={movies}
