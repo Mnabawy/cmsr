@@ -14,7 +14,7 @@ class MoviesTable extends React.Component {
   };
 
   render() {
-    const { movies, onSort: raiseSort } = this.props;
+    const { movies, onSort: raiseSort, searchText } = this.props;
     return (
       <table className="table text-left">
         <thead>
@@ -30,18 +30,19 @@ class MoviesTable extends React.Component {
           </tr>
         </thead>
         <tbody>
-          {movies.map(movie => {
-            return (
-              <tr key={movie._id}>
-                <td>
-                  <Link to={`/movies/${movie._id}`}>{movie.title}</Link>
-                </td>
-                <td>{movie.genre.name}</td>
-                <td>{movie.numberInStock}</td>
-                <td>{movie.dailyRentalRate}</td>
-              </tr>
-            );
-          })}
+          {movies
+            .map(movie => {
+              return (
+                <tr key={movie._id}>
+                  <td>
+                    <Link to={`/movies/${movie._id}`}>{movie.title}</Link>
+                  </td>
+                  <td>{movie.genre.name}</td>
+                  <td>{movie.numberInStock}</td>
+                  <td>{movie.dailyRentalRate}</td>
+                </tr>
+              );
+            })}
         </tbody>
       </table>
     );

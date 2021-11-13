@@ -20,6 +20,7 @@ class Movies extends React.Component {
       selectedGenre: "",
       sortColumn: { path: "title", order: "asc" },
       movies: [],
+      searchText: "",
     };
     this.handleClick = this.handleClick.bind(this);
     this.handlePageChange = this.handlePageChange.bind(this);
@@ -60,6 +61,12 @@ class Movies extends React.Component {
     });
   }
 
+  // search
+  onSearchChange = e => {
+    const { value } = e.target;
+    this.setState({ searchText: value });
+  };
+
   render() {
     const {
       movies: allMovies,
@@ -68,14 +75,24 @@ class Movies extends React.Component {
       genres,
       selectedGenre,
       sortColumn,
+      searchText,
     } = this.state;
 
     if (allMovies.length === 0) return "movies list is empty";
 
+    const list = allMovies.filter(movie => {
+      if (searchText == "") {
+        return movie;
+      } else if (movie.title.toLowerCase().includes(searchText.toLowerCase())) {
+        return movie;
+      }
+    });
+
     const filtered =
       selectedGenre && selectedGenre._id
-        ? allMovies.filter(m => m.genre._id === selectedGenre._id)
-        : allMovies;
+        ? list.filter(m => m.genre._id === selectedGenre._id)
+        : list;
+
     const sorted = _.orderBy(filtered, [sortColumn.path], [sortColumn.order]);
 
     const movies = Paginate(sorted, currentPage, pageSize);
@@ -90,13 +107,23 @@ class Movies extends React.Component {
           />
         </div>
         <div className="col-9">
-          {<p>rendring {filtered.length} movies</p>}
-
-          <Link to="/movies/new" className="btn btn-primary" >new movie</Link>
+          <Link to="/movies/new" className="btn btn-primary mt-2">
+            new movie
+          </Link>
+          {<p className="mt-2">rendring {filtered.length} movies</p>}
+          <input
+            type="text"
+            name="search"
+            onChange={this.onSearchChange}
+            value={searchText}
+            className="form-control mt-2 mb-3"
+            placeholder="enter text to search"
+          />
           <MoviesTable
             sortColumn={sortColumn}
             movies={movies}
             onSort={this.handleSort}
+            searchText={searchText}
           />
           <Pagination
             itemsCount={filtered.length}
