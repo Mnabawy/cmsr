@@ -1,8 +1,8 @@
 import React from "react";
 import _ from "lodash";
 
-import { getMovies } from "../services/fakeMovieService";
-import { genres, getGenres } from "../services/fakeGenreService";
+import { getMovies, deleteMovie } from "../services/movieService";
+import { getGenres } from "../services/genreService";
 import Pagination from "./common/pagination";
 import ListGroup from "./common/listGroup";
 import Paginate from "../utils/paginate";
@@ -28,24 +28,26 @@ class Movies extends React.Component {
     this.handleSort = this.handleSort.bind(this);
   }
 
-  componentDidMount() {
-    const genres = [{ _id: "", name: "All Genres" }, ...getGenres()];
+  async componentDidMount() {
+    const genresList = await getGenres();
+    const genres = [{ _id: "", name: "All Genres" }, ...genresList];
+    const moviesList = await getMovies();
 
-    this.setState({ movies: getMovies(), genres });
+    this.setState({ movies: moviesList, genres });
   }
 
-  handleDelete(id) {
-    const movies = this.state.movies.filter(movie => movie._id !== id);
-    // limit the list to only 4 element
+  handleDelete = async id => {
+    const movies = [...this.state.movies];
+    const filtered = movies.filter(m => m._id !== id);
+    this.setState({ movies: filtered });
+    return await deleteMovie(id);
+  };
 
-    this.setState({ movies });
-  }
-
-  handleClick(event) {
+  handleClick = async event => {
     this.setState({
       currentPage: Number(event.target.id),
     });
-  }
+  };
 
   handlePageChange(page) {
     this.setState({ currentPage: page });
@@ -124,6 +126,7 @@ class Movies extends React.Component {
             movies={movies}
             onSort={this.handleSort}
             searchText={searchText}
+            onDelete={this.handleDelete}
           />
           <Pagination
             itemsCount={filtered.length}

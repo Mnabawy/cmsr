@@ -1,8 +1,8 @@
 import React from "react";
 import Joi from "joi-browser";
 
-import { getGenres } from "../services/fakeGenreService";
-import { getMovie, getMovies, saveMovie } from "../services/fakeMovieService";
+import { getGenres } from "../services/genreService";
+import { getMovie, saveMovie } from "../services/movieService";
 import InputField from "./common/inputField";
 import Form from "./common/form";
 
@@ -34,15 +34,17 @@ class MovieForm extends Form {
       .label("Daily Rental Rate"),
   };
 
-  componentDidMount() {
-    const genres = getGenres();
+  // update a movie
+
+  async componentDidMount() {
+    const genres = await getGenres();
     this.setState({ genres });
 
     const movieId = this.props.match.params.id;
-    console.log(this.props.match.params);
+
     if (movieId === "new") return;
 
-    const movie = getMovie(movieId);
+    const movie = await getMovie(movieId);
     if (!movie) return this.props.history.replace("/not-found");
 
     this.setState({ data: this.mapToViewModel(movie) });
@@ -101,9 +103,11 @@ class MovieForm extends Form {
               </option>
             ))}
           </select>
-          {genreError &&
-            <div className="alert alert-danger " style={{marginTop:-16}}>{genreError}</div>
-          }
+          {genreError && (
+            <div className="alert alert-danger " style={{ marginTop: -16 }}>
+              {genreError}
+            </div>
+          )}
 
           <InputField
             label="Number In Stock"
